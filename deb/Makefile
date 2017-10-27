@@ -122,7 +122,8 @@ openssl-debug-build: | openssl-debug-clean openssl-debug-download
 
 .PHONY: openssl-clean
 openssl-clean:
-	sudo apt-get -y -qq install openresty-zlib-dev
+	#sudo apt-get -y -qq install openresty-zlib-dev
+	dpkg -i /root/deb_packages/openresty*.deb
 	cd openresty-openssl && debclean
 	find openresty-openssl -maxdepth 1 ! -name 'debian' ! -name 'openresty-openssl' -print | xargs rm -rf
 	rm -f openresty-openssl*.deb
@@ -159,7 +160,8 @@ openresty-build: | openresty-clean openresty-download
 
 .PHONY: openresty-clean
 openresty-clean:
-	sudo apt-get -y -qq install openresty-zlib-dev openresty-pcre-dev openresty-openssl-dev
+	#sudo apt-get -y -qq install openresty-zlib-dev openresty-pcre-dev openresty-openssl-dev
+	dpkg -i /root/deb_packages/openresty*.deb
 	cd openresty && debclean
 	find openresty -maxdepth 1 ! -name 'debian' ! -name 'openresty' -print | xargs rm -rf
 	rm -f openresty*.deb
@@ -185,36 +187,12 @@ openresty-debug-build: | openresty-debug-clean openresty-debug-download
 
 .PHONY: openresty-debug-clean
 openresty-debug-clean:
-	sudo apt-get -y -qq install openresty-zlib-dev openresty-pcre-dev openresty-openssl-debug-dev
+	#sudo apt-get -y -qq install openresty-zlib-dev openresty-pcre-dev openresty-openssl-debug-dev
+	dpkg -i /root/deb_packages/openresty*.deb
 	-cd openresty-debug && debclean
 	find openresty-debug -maxdepth 1 ! -name 'debian' ! -name 'openresty-debug' -print | xargs rm -rf
 	rm -f openresty-debug*.deb
 	rm -f openresty-debug_*.*
-
-.PHONY: openresty-valgrind-download
-openresty-valgrind-download:
-	rm -f *.orig.tar.*
-	wget -nH --cut-dirs=100 --mirror 'https://openresty.org/download/openresty-$(OR_VER).tar.gz'
-	cp openresty-$(OR_VER).tar.gz openresty-valgrind_$(OR_VER).orig.tar.gz
-
-.PHONY: openresty-valgrind-build
-openresty-valgrind-build: | openresty-valgrind-clean openresty-valgrind-download
-	sudo apt-get -y -qq install openresty-zlib-dev openresty-pcre-dev openresty-openssl-debug-dev valgrind
-	rm -f *.deb *.debian.tar.xz *.dsc *.changes
-	tar xf openresty-valgrind_$(OR_VER).orig.tar.gz --strip-components=1 -C openresty-valgrind
-	cd openresty-valgrind \
-		&& tpage --define distro=$(DISTRO) debian/changelog.tt2 > debian/changelog \
-		&& debuild -sa $(OPTS) -j$(JOBS)
-	#for f in openresty-valgrind*.deb; do debsigs --sign=origin -K D5EDEB74 $$f || exit 1; done
-	if [ -f ./upload ]; then ./upload || exit 1; fi
-
-.PHONY: openresty-valgrind-clean
-openresty-valgrind-clean:
-	sudo apt-get -y -qq install openresty-zlib-dev openresty-pcre-dev openresty-openssl-debug-dev valgrind
-	-cd openresty-valgrind && debclean
-	find openresty-valgrind -maxdepth 1 ! -name 'debian' ! -name 'openresty-valgrind' -print | xargs rm -rf
-	rm -f openresty-valgrind*.deb
-	rm -f openresty-valgrind_*.*
 
 .PHONY: lemplate-download
 lemplate-download:
