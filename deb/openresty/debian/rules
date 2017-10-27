@@ -43,7 +43,6 @@ override_dh_auto_configure:
 	  --with-file-aio \
 	  --with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT' \
 	  --with-dtrace-probes \
-	  --add-module=/root/replace-filter-nginx-module-0.01rc5 \
 	  --add-module=/root/ngx_brotli \
 	  -j$(NJBS)
 
