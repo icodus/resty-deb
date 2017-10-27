@@ -20,8 +20,8 @@ DISTRO:=$(shell lsb_release -c|awk '{print $$2}')
 
 .PHONY: build
 build: zlib-build pcre-build openssl-build \
-	openssl-debug-build openresty-build openresty-debug-build \
-	lemplate-build test-nginx-build
+	openresty-build \
+	lemplate-build
 
 .PHONY: clean
 clean: zlib-clean pcre-clean openssl-clean openssl-debug-clean \
