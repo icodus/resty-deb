@@ -34,6 +34,7 @@ override_dh_auto_configure:
 	  --with-http_random_index_module \
 	  --with-http_gzip_static_module \
 	  --with-http_sub_module \
+	  --with-http_geoip_module \
 	  --with-http_dav_module \
 	  --with-http_flv_module \
 	  --with-http_mp4_module \
@@ -42,6 +43,8 @@ override_dh_auto_configure:
 	  --with-file-aio \
 	  --with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT' \
 	  --with-dtrace-probes \
+	  --add-module=/root/replace-filter-nginx-module-0.01rc5 \
+	  --add-module=/root/ngx_brotli \
 	  -j$(NJBS)
 
 override_dh_usrlocal:
