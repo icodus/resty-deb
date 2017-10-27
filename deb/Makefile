@@ -21,12 +21,11 @@ DISTRO:=$(shell lsb_release -c|awk '{print $$2}')
 .PHONY: build
 build: zlib-build pcre-build openssl-build \
 	openssl-debug-build openresty-build openresty-debug-build \
-	openresty-valgrind-build \
 	lemplate-build test-nginx-build
 
 .PHONY: clean
 clean: zlib-clean pcre-clean openssl-clean openssl-debug-clean \
-	openresty-clean openresty-debug-clean openresty-valgrind-clean \
+	openresty-clean openresty-debug-clean \
 	lemplate-clean test-nginx-clean
 
 .PHONY: zlib-download
@@ -43,6 +42,8 @@ zlib-build: | zlib-clean zlib-download
 		&& tpage --define distro=$(DISTRO) debian/changelog.tt2 > debian/changelog \
 		&& debuild $(OPTS) -j$(JOBS)
 	#for f in *.deb; do debsigs --sign=origin -K D5EDEB74 $$f || exit 1; done
+	cd ../
+	cp *.deb /root/deb_packages/
 	if [ -f ./upload ]; then ./upload || exit 1; fi
 
 .PHONY: zlib-clean
@@ -67,6 +68,8 @@ pcre-build: | pcre-clean pcre-download
 		&& tpage --define distro=$(DISTRO) debian/changelog.tt2 > debian/changelog \
 		&& debuild $(OPTS) -j$(JOBS)
 	#for f in openresty-pcre*.deb; do debsigs --sign=origin -K D5EDEB74 $$f || exit 1; done
+	cd ../
+	cp *.deb /root/deb_packages/
 	if [ -f ./upload ]; then ./upload || exit 1; fi
 
 .PHONY: pcre-clean
@@ -85,13 +88,16 @@ openssl-download:
 
 .PHONY: openssl-build
 openssl-build: | openssl-clean openssl-download
-	sudo apt-get -y -qq install openresty-zlib-dev
+	#sudo apt-get -y -qq install openresty-zlib-dev
+	dpkg -i /root/deb_packages/openresty*.deb
 	rm -f *.deb *.debian.tar.xz *.dsc *.changes
 	tar xf openresty-openssl_$(SSL_VER).orig.tar.gz --strip-components=1 -C openresty-openssl
 	cd openresty-openssl \
 		&& tpage --define distro=$(DISTRO) debian/changelog.tt2 > debian/changelog \
 		&& debuild $(OPTS) -j$(JOBS)
 	#for f in openresty-openssl*.deb; do debsigs --sign=origin -K D5EDEB74 $$f || exit 1; done
+	cd ../
+	cp *.deb /root/deb_packages/
 	if [ -f ./upload ]; then ./upload || exit 1; fi
 
 .PHONY: openssl-debug-download
@@ -102,13 +108,16 @@ openssl-debug-download:
 
 .PHONY: openssl-debug-build
 openssl-debug-build: | openssl-debug-clean openssl-debug-download
-	sudo apt-get -y -qq install openresty-zlib-dev
+	#sudo apt-get -y -qq install openresty-zlib-dev
+	dpkg -i /root/deb_packages/openresty*.deb
 	rm -f *.deb *.debian.tar.xz *.dsc *.changes
 	tar xf openresty-openssl-debug_$(SSL_VER).orig.tar.gz --strip-components=1 -C openresty-openssl-debug
 	cd openresty-openssl-debug \
 		&& tpage --define distro=$(DISTRO) debian/changelog.tt2 > debian/changelog \
 		&& debuild -sa $(OPTS) -j$(JOBS)
 	#for f in openresty-openssl-debug*.deb; do debsigs --sign=origin -K D5EDEB74 $$f || exit 1; done
+	cd ../
+	cp *.deb /root/deb_packages/
 	if [ -f ./upload ]; then ./upload || exit 1; fi
 
 .PHONY: openssl-clean
@@ -121,7 +130,8 @@ openssl-clean:
 
 .PHONY: openssl-debug-clean
 openssl-debug-clean:
-	sudo apt-get -y -qq install openresty-zlib-dev
+	#sudo apt-get -y -qq install openresty-zlib-dev
+	dpkg -i /root/deb_packages/openresty*.deb
 	-cd openresty-openssl-debug && debclean
 	find openresty-openssl-debug -maxdepth 1 ! -name 'debian' ! -name 'openresty-openssl-debug' -print | xargs rm -rf
 	rm -f openresty-openssl*.deb
@@ -135,13 +145,16 @@ openresty-download:
 
 .PHONY: openresty-build
 openresty-build: | openresty-clean openresty-download
-	sudo apt-get -y -qq install openresty-zlib-dev openresty-pcre-dev openresty-openssl-dev
+	#sudo apt-get -y -qq install openresty-zlib-dev openresty-pcre-dev openresty-openssl-dev
+	dpkg -i /root/deb_packages/openresty*.deb
 	rm -f *.deb *.debian.tar.xz *.dsc *.changes
 	tar xf openresty_$(OR_VER).orig.tar.gz --strip-components=1 -C openresty
 	cd openresty \
 		&& tpage --define distro=$(DISTRO) debian/changelog.tt2 > debian/changelog \
 		&& debuild $(OPTS) -j$(JOBS)
 	#for f in openresty*.deb; do debsigs --sign=origin -K D5EDEB74 $$f || exit 1; done
+	cd ../
+	cp *.deb /root/deb_packages/
 	if [ -f ./upload ]; then ./upload || exit 1; fi
 
 .PHONY: openresty-clean
@@ -160,7 +173,8 @@ openresty-debug-download:
 
 .PHONY: openresty-debug-build
 openresty-debug-build: | openresty-debug-clean openresty-debug-download
-	sudo apt-get -y -qq install openresty-zlib-dev openresty-pcre-dev openresty-openssl-debug-dev
+	#sudo apt-get -y -qq install openresty-zlib-dev openresty-pcre-dev openresty-openssl-debug-dev
+	dpkg -i /root/deb_packages/openresty*.deb
 	rm -f *.deb *.debian.tar.xz *.dsc *.changes
 	tar xf openresty-debug_$(OR_VER).orig.tar.gz --strip-components=1 -C openresty-debug
 	cd openresty-debug \
@@ -224,6 +238,8 @@ lemplate-build: | lemplate-clean lemplate-download
 		&& tpage --define distro=$(DISTRO) debian/changelog.tt2 > debian/changelog \
 		&& debuild -sa $(OPTS) -j$(JOBS)
 	#for f in openresty-valgrind*.deb; do debsigs --sign=origin -K D5EDEB74 $$f || exit 1; done
+	cd ../
+	cp *.deb /root/deb_packages/
 	if [ -f ./upload ]; then ./upload || exit 1; fi
 
 .PHONY: test-nginx-download
@@ -248,6 +264,8 @@ test-nginx-build: | test-nginx-clean test-nginx-download
 		&& tpage --define distro=$(DISTRO) debian/changelog.tt2 > debian/changelog \
 		&& debuild -sa $(OPTS) -j$(JOBS)
 	#for f in openresty-valgrind*.deb; do debsigs --sign=origin -K D5EDEB74 $$f || exit 1; done
+	cd ../
+	cp *.deb /root/deb_packages/
 	if [ -f ./upload ]; then ./upload || exit 1; fi
 
 ### Makefile ends here
