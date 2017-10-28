@@ -24,9 +24,9 @@ build: zlib-build pcre-build openssl-build \
 	lemplate-build
 
 .PHONY: clean
-clean: zlib-clean pcre-clean openssl-clean openssl-debug-clean \
-	openresty-clean openresty-debug-clean \
-	lemplate-clean test-nginx-clean
+clean: zlib-clean pcre-clean openssl-clean \
+	openresty-clean \
+	lemplate-clean
 
 .PHONY: zlib-download
 zlib-download:
@@ -213,32 +213,6 @@ lemplate-build: | lemplate-clean lemplate-download
 	rm -f *.deb *.debian.tar.xz *.dsc *.changes
 	tar xf liblemplate-perl_$(LEMPLATE_VER).orig.tar.gz --strip-components=1 -C liblemplate-perl
 	cd liblemplate-perl \
-		&& tpage --define distro=$(DISTRO) debian/changelog.tt2 > debian/changelog \
-		&& debuild -sa $(OPTS) -j$(JOBS)
-	#for f in openresty-valgrind*.deb; do debsigs --sign=origin -K D5EDEB74 $$f || exit 1; done
-	cd ../
-	cp *.deb /root/deb_packages/
-	if [ -f ./upload ]; then ./upload || exit 1; fi
-
-.PHONY: test-nginx-download
-test-nginx-download:
-	rm -f *.orig.tar.*
-	wget -nH --cut-dirs=100 --mirror 'http://search.cpan.org/CPAN/authors/id/A/AG/AGENT/Test-Nginx-$(TEST_NGINX_VER).tar.gz'
-	cp Test-Nginx-$(TEST_NGINX_VER).tar.gz libtest-nginx-perl_$(TEST_NGINX_VER).orig.tar.gz
-
-.PHONY: test-nginx-clean
-test-nginx-clean:
-	-cd libtest-nginx-perl/ && debclean
-	find libtest-nginx-perl -maxdepth 1 ! -name 'debian' ! -name 'libtest-nginx-perl' -print | xargs rm -rf
-	rm -f libtest-nginx-perl*.deb
-	rm -f libtest-nginx-perl_*.*
-
-.PHONY: test-nginx-build
-test-nginx-build: | test-nginx-clean test-nginx-download
-	sudo apt-get -y -qq install libtest-base-perl libtest-longstring-perl libtext-diff-perl liblist-moreutils-perl
-	rm -f *.deb *.debian.tar.xz *.dsc *.changes
-	tar xf libtest-nginx-perl_$(TEST_NGINX_VER).orig.tar.gz --strip-components=1 -C libtest-nginx-perl
-	cd libtest-nginx-perl \
 		&& tpage --define distro=$(DISTRO) debian/changelog.tt2 > debian/changelog \
 		&& debuild -sa $(OPTS) -j$(JOBS)
 	#for f in openresty-valgrind*.deb; do debsigs --sign=origin -K D5EDEB74 $$f || exit 1; done
