@@ -1,5 +1,5 @@
-sevretec (1.11.2.5-3~[% distro %]1) [% distro %]; urgency=low
+openresty (1.11.2.5-3~[% distro %]1+sevre1) [% distro %]; urgency=low
 
-  * Initial release
+  * Sevretec version
 
  -- Wiktor T. Sadowski <wiktor.t.sadowski@gmail.com>  Sun, 29 Oct 2017 12:09:26 -0700
